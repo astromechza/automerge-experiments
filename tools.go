@@ -1,6 +1,8 @@
-package automergeexp
+//go:build tools
+// +build tools
 
-require (
-     _ "github.com/automerge/automerge-go"
+package main
+
+import (
+	_ "github.com/automerge/automerge-go"
 )
-

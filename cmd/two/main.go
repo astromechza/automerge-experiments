@@ -28,15 +28,18 @@ func main() {
 	if err := doc.Path("x").Set(1); err != nil {
 		panic(err)
 	}
-	if err := doc2.Path("y").Set(1); err != nil {
+	if err := doc2.Path("y").Counter().Inc(1); err != nil {
 		panic(err)
 	}
 	if err := doc2.Path("x").Set(2); err != nil {
 		panic(err)
 	}
+	if err := doc2.Path("y").Counter().Inc(1); err != nil {
+		panic(err)
+	}
 
-	slog.Info(doc.RootMap().GoString())
-	slog.Info(doc2.RootMap().GoString())
+	slog.Info("doc1: " + doc.RootMap().GoString())
+	slog.Info("doc2: " + doc2.RootMap().GoString())
 
 	// now we have a head
 	slog.Info("heads", "h", doc.Heads())
@@ -50,9 +53,8 @@ func main() {
 		panic(err)
 	}
 
-	slog.Info(doc.RootMap().GoString())
-	slog.Info(doc2.RootMap().GoString())
-
+	slog.Info("doc1: " + doc.RootMap().GoString())
+	slog.Info("doc2: " + doc2.RootMap().GoString())
 }
 
 func sync(ss1 *automerge.SyncState, ss2 *automerge.SyncState) error {
@@ -67,6 +69,7 @@ func sync(ss1 *automerge.SyncState, ss2 *automerge.SyncState) error {
 				if _, err := ss2.ReceiveMessage(msg.Bytes()); err != nil {
 					return err
 				}
+				slog.Info("ss2: " + ss2.Doc.RootMap().GoString())
 			} else {
 				break
 			}
@@ -79,6 +82,7 @@ func sync(ss1 *automerge.SyncState, ss2 *automerge.SyncState) error {
 				if _, err := ss1.ReceiveMessage(msg.Bytes()); err != nil {
 					return err
 				}
+				slog.Info("ss1: " + ss1.Doc.RootMap().GoString())
 			} else {
 				break
 			}

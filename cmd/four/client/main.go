@@ -21,6 +21,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/astromechza/automerge-experiments/cmd/four/pkg"
+	"github.com/astromechza/automerge-experiments/pkg/viz"
 )
 
 func main() {
@@ -88,7 +89,7 @@ func mainInner() error {
 
 	wg.Wait()
 
-	tf := filepath.Join(os.TempDir(), doc.ActorID()+".doc")
+	tf := filepath.Join(os.TempDir(), doc.ActorID()+".automerge")
 	if f, err := os.Create(tf); err != nil {
 		return err
 	} else {
@@ -97,7 +98,12 @@ func mainInner() error {
 			return err
 		}
 	}
-	slog.Info("dumped", "dump", tf)
+	slog.Info("dumped", "path", tf)
+	if svgPath, err := viz.RenderToTemp(doc, []interface{}{"counter"}); err != nil {
+		slog.Error("failed to render", "err", err)
+	} else {
+		slog.Info("rendered", "path", "file://"+svgPath)
+	}
 	return nil
 }
 

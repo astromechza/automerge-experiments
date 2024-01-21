@@ -24,6 +24,7 @@ import (
 	"github.com/automerge/automerge-go"
 
 	"github.com/astromechza/automerge-experiments/cmd/four/pkg"
+	"github.com/astromechza/automerge-experiments/pkg/viz"
 )
 
 func main() {
@@ -111,7 +112,7 @@ func mainInner() error {
 
 	s.cache.Range(func(storeId, docRaw any) bool {
 		doc := docRaw.(*automerge.Doc)
-		tf := filepath.Join(os.TempDir(), doc.ActorID()+".doc")
+		tf := filepath.Join(os.TempDir(), doc.ActorID()+".automerge")
 		if f, err := os.Create(tf); err != nil {
 			slog.Error("failed to dump", "store", storeId, "err", err)
 		} else {
@@ -121,6 +122,11 @@ func mainInner() error {
 			}
 		}
 		slog.Info("dumped", "store", storeId, "path", tf)
+		if svgPath, err := viz.RenderToTemp(doc, []interface{}{"counter"}); err != nil {
+			slog.Error("failed to render", "store", storeId, "err", err)
+		} else {
+			slog.Info("rendered", "store", storeId, "path", "file://"+svgPath)
+		}
 		return true
 	})
 
